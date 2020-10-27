@@ -33,6 +33,12 @@ variable "enabled_for_template_deployment" {
   default     = false
 }
 
+variable "soft_delete_retention_days" {
+  description = "The number of days that items should be retained for once soft-deleted."
+  type        = number
+  default     = 7
+}
+
 variable "access_policies" {
   description = "Map of access policies for an object_id (user, service principal, security group) to backend."
   type        = list(object({ object_id = string, certificate_permissions = list(string), key_permissions = list(string), secret_permissions = list(string), storage_permissions = list(string) }))
