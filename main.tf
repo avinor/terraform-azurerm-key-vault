@@ -1,8 +1,10 @@
 terraform {
-  required_version = ">= 0.12.0"
-  required_providers {
-    azurerm = "~> 1.44.0"
-  }
+  required_version = ">= 0.12.6"
+}
+
+provider "azurerm" {
+  version = "~> 2.35.0"
+  features {}
 }
 
 data "azurerm_client_config" "current" {}
