@@ -9,6 +9,31 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
+locals {
+  diag_key_vault_logs = [
+    "AuditEvent",
+  ]
+
+  diag_key_vault_metrics = [
+    "AllMetrics",
+  ]
+
+  diag_resource_list = var.diagnostics != null ? split("/", var.diagnostics.destination) : []
+  parsed_diag = var.diagnostics != null ? {
+    log_analytics_id   = contains(local.diag_resource_list, "microsoft.operationalinsights") ? var.diagnostics.destination : null
+    storage_account_id = contains(local.diag_resource_list, "Microsoft.Storage") ? var.diagnostics.destination : null
+    event_hub_auth_id  = contains(local.diag_resource_list, "Microsoft.EventHub") ? var.diagnostics.destination : null
+    metric             = contains(var.diagnostics.metrics, "all") ? local.diag_key_vault_metrics : var.diagnostics.metrics
+    log                = contains(var.diagnostics.logs, "all") ? local.diag_key_vault_logs : var.diagnostics.logs
+    } : {
+    log_analytics_id   = null
+    storage_account_id = null
+    event_hub_auth_id  = null
+    metric             = []
+    log                = []
+  }
+}
+
 resource "azurerm_resource_group" "main" {
   name     = var.resource_group_name
   location = var.location
@@ -42,29 +67,6 @@ resource "azurerm_key_vault" "main" {
   tags = var.tags
 }
 
-resource "azurerm_monitor_diagnostic_setting" "main" {
-  count                      = var.log_analytics_workspace_id != null ? 1 : 0
-  name                       = format("%s-analytics", var.name)
-  target_resource_id         = azurerm_key_vault.main.id
-  log_analytics_workspace_id = var.log_analytics_workspace_id
-
-  log {
-    category = "AuditEvent"
-
-    retention_policy {
-      enabled = false
-    }
-  }
-
-  metric {
-    category = "AllMetrics"
-
-    retention_policy {
-      enabled = false
-    }
-  }
-}
-
 resource "azurerm_key_vault_access_policy" "main" {
   count        = length(var.access_policies)
   key_vault_id = azurerm_key_vault.main.id
@@ -76,4 +78,36 @@ resource "azurerm_key_vault_access_policy" "main" {
   key_permissions         = var.access_policies[count.index].key_permissions
   certificate_permissions = var.access_policies[count.index].certificate_permissions
   storage_permissions     = var.access_policies[count.index].storage_permissions
+}
+
+resource "azurerm_monitor_diagnostic_setting" "keyvault" {
+  count                          = var.diagnostics != null ? 1 : 0
+  name                           = "${var.name}-ns-diag"
+  target_resource_id             = azurerm_key_vault.main.id
+  log_analytics_workspace_id     = local.parsed_diag.log_analytics_id
+  eventhub_authorization_rule_id = local.parsed_diag.event_hub_auth_id
+  eventhub_name                  = local.parsed_diag.event_hub_auth_id != null ? var.diagnostics.eventhub_name : null
+  storage_account_id             = local.parsed_diag.storage_account_id
+
+  dynamic "log" {
+    for_each = local.parsed_diag.log
+    content {
+      category = log.value
+
+      retention_policy {
+        enabled = false
+      }
+    }
+  }
+
+  dynamic "metric" {
+    for_each = local.parsed_diag.metric
+    content {
+      category = metric.value
+
+      retention_policy {
+        enabled = false
+      }
+    }
+  }
 }
