@@ -41,19 +41,36 @@ variable "soft_delete_retention_days" {
 
 variable "access_policies" {
   description = "Map of access policies for an object_id (user, service principal, security group) to backend."
-  type        = list(object({ object_id = string, certificate_permissions = list(string), key_permissions = list(string), secret_permissions = list(string), storage_permissions = list(string) }))
-  default     = []
+  type = list(object({
+    object_id               = string,
+    certificate_permissions = list(string),
+    key_permissions         = list(string),
+    secret_permissions      = list(string),
+    storage_permissions     = list(string),
+  }))
+  default = []
 }
 
 variable "network_acls" {
   description = "Network rules to apply to key vault."
-  type        = object({ bypass = string, default_action = string, ip_rules = list(string), virtual_network_subnet_ids = list(string) })
-  default     = null
+  type = object({
+    bypass                     = string,
+    default_action             = string,
+    ip_rules                   = list(string),
+    virtual_network_subnet_ids = list(string),
+  })
+  default = null
 }
 
-variable "log_analytics_workspace_id" {
-  description = "Specifies the ID of a Log Analytics Workspace where Diagnostics Data should be sent."
-  default     = null
+variable "diagnostics" {
+  description = "Diagnostic settings for those resources that support it. See README.md for details on configuration."
+  type = object({
+    destination   = string,
+    eventhub_name = string,
+    logs          = list(string),
+    metrics       = list(string)
+  })
+  default = null
 }
 
 variable "tags" {
