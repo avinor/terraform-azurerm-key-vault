@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "~> 2.35.0"
+  version = "~> 2.50.0"
   features {}
 }
 
@@ -51,7 +51,6 @@ resource "azurerm_key_vault" "main" {
   enabled_for_deployment          = var.enabled_for_deployment
   enabled_for_disk_encryption     = var.enabled_for_disk_encryption
   enabled_for_template_deployment = var.enabled_for_template_deployment
-  soft_delete_enabled             = true
   soft_delete_retention_days      = var.soft_delete_retention_days
 
   dynamic "network_acls" {
