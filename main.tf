@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "azurerm" {
-  version = "~> 2.35.0"
+  version = "~> 2.50.0"
   features {}
 }
 
@@ -20,7 +20,7 @@ locals {
 
   diag_resource_list = var.diagnostics != null ? split("/", var.diagnostics.destination) : []
   parsed_diag = var.diagnostics != null ? {
-    log_analytics_id   = contains(local.diag_resource_list, "microsoft.operationalinsights") ? var.diagnostics.destination : null
+    log_analytics_id   = contains(local.diag_resource_list, "Microsoft.OperationalInsights") ? var.diagnostics.destination : null
     storage_account_id = contains(local.diag_resource_list, "Microsoft.Storage") ? var.diagnostics.destination : null
     event_hub_auth_id  = contains(local.diag_resource_list, "Microsoft.EventHub") ? var.diagnostics.destination : null
     metric             = contains(var.diagnostics.metrics, "all") ? local.diag_key_vault_metrics : var.diagnostics.metrics
@@ -51,7 +51,6 @@ resource "azurerm_key_vault" "main" {
   enabled_for_deployment          = var.enabled_for_deployment
   enabled_for_disk_encryption     = var.enabled_for_disk_encryption
   enabled_for_template_deployment = var.enabled_for_template_deployment
-  soft_delete_enabled             = true
   soft_delete_retention_days      = var.soft_delete_retention_days
 
   dynamic "network_acls" {
