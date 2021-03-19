@@ -1,7 +1,7 @@
 module "simple" {
-    source = "../../"
+  source = "../../"
 
-    name = "simple"
-    resource_group_name = "simple-kv-rg"
-    location = "westeurope"
+  name                = "simple"
+  resource_group_name = "simple-kv-rg"
+  location            = "westeurope"
 }
