@@ -83,7 +83,7 @@ data "azurerm_monitor_diagnostic_categories" "default" {
   resource_id = azurerm_key_vault.main.id
 }
 
-resource "azurerm_monitor_diagnostic_setting" "namespace" {
+resource "azurerm_monitor_diagnostic_setting" "keyvault" {
   count                          = var.diagnostics != null ? 1 : 0
   name                           = "${var.name}-ns-diag"
   target_resource_id             = azurerm_key_vault.main.id
