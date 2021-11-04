@@ -8,6 +8,8 @@
 # .tfvars files
 *.tfvars
 
+*.terraform.lock.hcl
+
 # Intellij IDEA files
 .idea
 *.iml
