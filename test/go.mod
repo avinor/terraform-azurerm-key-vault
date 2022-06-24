@@ -1,6 +1,6 @@
 module github.com/avinor/terraform-azurerm-key-vault/test
 
-go 1.17
+go 1.18
 
 require github.com/gruntwork-io/terratest v0.32.8
 
